@@ -36,7 +36,7 @@ public abstract class Game extends Observable implements Runnable{
 	public void run() {
 		while(isRunning) {
 			step();
-      try {
+      	try {
 				Thread.sleep((long) time);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -57,6 +57,7 @@ public abstract class Game extends Observable implements Runnable{
 		isRunning=true;
 		thread = new Thread(this);
 		thread.start();
+		run();
 	}
 	
 	
