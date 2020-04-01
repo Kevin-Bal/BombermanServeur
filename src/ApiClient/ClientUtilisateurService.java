@@ -35,20 +35,23 @@ public class ClientUtilisateurService {
 
             // print result
             userString = response.toString();
+            JsonObject userJson = new JsonParser().parse(userString).getAsJsonObject();
+
+            Utilisateur user = gson.fromJson(userJson,Utilisateur.class);
+
+            return user;
         } else {
             System.out.println("GET request not worked");
+            return null;
         }
-        JsonObject userJson = new JsonParser().parse(userString).getAsJsonObject();
 
-        Utilisateur user = gson.fromJson(userJson,Utilisateur.class);
-
-        return user;
 
     }
 
     public static void main(String[] args) throws IOException {
         ClientUtilisateurService user = new ClientUtilisateurService();
         Utilisateur utilisateur = user.getUtilisateur("roger@rog.fr","pute");
+        if(utilisateur == null)
         System.out.println(utilisateur.getEmail()+" "+utilisateur.getPassWord()+" "+utilisateur.getUserName());
     }
 }

@@ -4,11 +4,11 @@ import Agent.Bomberman;
 import ApiClient.ClientUtilisateurService;
 import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
-import Controler.GameState;
 import Controler.Map;
 import Model.BombermanGame;
 import Strategies.Strategy;
 import Strategies.StrategyBombermanRandom;
+import bean.ServerObject;
 
 import java.net.*;
 import java.io.*;
@@ -91,29 +91,41 @@ public class ServiceClient implements Runnable, Observer {
             e.printStackTrace();
         }
 
-        ma_sortie.println("Quel est votre ad mail :");
+        ma_sortie.println("[Serveur]: Quel est votre ad mail :");
         // Initialisation du nom du client
-        try {
-            email = flux_entrant.readLine();
-            joueur = user.getUtilisateur(email, "pute");
-            nomClient = joueur.getUserName();
+        while(nomClient.equals("")){
+            try {
+                email = flux_entrant.readLine();
+                joueur = user.getUtilisateur(email, "pute");
+                if(joueur == null){
+                    ma_sortie.println("[Serveur]: Mauvaise adresse mail : réessayer !");
+                }
+                else
+                    nomClient = joueur.getUserName();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
+        ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);
 
-        if(!nomClient.equals("")){
 
-            for(int i = 0 ; i < nombre_bbm; i++)
-                objets_strategies.add(new StrategyBombermanRandom());
+            if(!nomClient.equals("")){
 
-            game.getEtatJeu().setStrategies_bombermans(objets_strategies);
+                for(int i = 0 ; i < nombre_bbm; i++)
+                    objets_strategies.add(new StrategyBombermanRandom());
 
-            game.launch();
+                game.getEtatJeu().setStrategies_bombermans(objets_strategies);
 
-        }
+                game.launch();
+
+            }
+
+
+
 
     }
 
@@ -123,16 +135,16 @@ public class ServiceClient implements Runnable, Observer {
         this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), this.game.getEtatJeu().getBombermans(), this.game.getEtatJeu().getItems(), this.game.getEtatJeu().getBombs());
 
         if(game.isEndgame()){
-            ma_sortie.println("Fin de la partie : ");
+            ma_sortie.println("[Serveur]: Fin de la partie : ");
             for(Agent b : this.game.getEtatJeu().getBombermans()) {
                 Bomberman temp = (Bomberman) b;
-                ma_sortie.println("Score de "+temp.getColor()+" : " + temp.score);
+                ma_sortie.println("[Serveur]: Score de "+temp.getColor()+" : " + temp.score);
             }
         }
-       /* try {
+        try {
             objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }

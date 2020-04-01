@@ -1,4 +1,4 @@
-package Serveur;
+package bean;
 
 import Agent.Agent;
 import Item.InfoBomb;
