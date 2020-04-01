@@ -1,5 +1,8 @@
 package Serveur;/* On  importe les  classes  Reseau, Entrees Sorties, Utilitaires */
 import Agent.Agent;
+import Agent.Bomberman;
+import ApiClient.ClientUtilisateurService;
+import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
 import Controler.GameState;
 import Controler.Map;
@@ -22,6 +25,9 @@ public class ServiceClient implements Runnable, Observer {
     private ControleurBombermanGame controleurBombermanGame;
     private PrintWriter ma_sortie = null;
     private ObjectOutputStream objectOutputStream = null;
+    private ServerObject sendObject = new ServerObject();
+    private ClientUtilisateurService user = new ClientUtilisateurService();
+    private Utilisateur joueur = null;
 
     // Elements envoyés par le client vers le serveur poour initialiser des attributs important
     private  String nomClient = "";
@@ -85,12 +91,12 @@ public class ServiceClient implements Runnable, Observer {
             e.printStackTrace();
         }
 
-
-        String  message_lu = new String();
-
+        ma_sortie.println("Quel est votre ad mail :");
         // Initialisation du nom du client
         try {
-            nomClient = flux_entrant.readLine();
+            email = flux_entrant.readLine();
+            joueur = user.getUtilisateur(email, "pute");
+            nomClient = joueur.getUserName();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,19 +105,6 @@ public class ServiceClient implements Runnable, Observer {
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
 
         if(!nomClient.equals("")){
-            ma_sortie.println("Quel est votre ad mail :");
-            try {
-                this.email = flux_entrant.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            ma_sortie.println("Quel est votre mdp :");
-            try {
-                this.mdp = flux_entrant.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             for(int i = 0 ; i < nombre_bbm; i++)
                 objets_strategies.add(new StrategyBombermanRandom());
@@ -127,12 +120,17 @@ public class ServiceClient implements Runnable, Observer {
     @Override
     public void update(Observable observable, Object o) {
         System.out.println("Tours : "+Integer.toString(game.getTurn()));
-        //ma_sortie.println("Tour : " + game.getTurn());
-        for(Agent a : game.getEtatJeu().getBombermans())
-            ma_sortie.println("Agent "+a.getType()+" : x("+a.getX()+") y("+a.getY()+")");
+        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), this.game.getEtatJeu().getBombermans(), this.game.getEtatJeu().getItems(), this.game.getEtatJeu().getBombs());
 
-        /*try {
-            objectOutputStream.writeObject(game.getMap());
+        if(game.isEndgame()){
+            ma_sortie.println("Fin de la partie : ");
+            for(Agent b : this.game.getEtatJeu().getBombermans()) {
+                Bomberman temp = (Bomberman) b;
+                ma_sortie.println("Score de "+temp.getColor()+" : " + temp.score);
+            }
+        }
+       /* try {
+            objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
         }*/
