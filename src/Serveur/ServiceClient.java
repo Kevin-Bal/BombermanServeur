@@ -5,22 +5,27 @@ import ApiClient.ClientUtilisateurService;
 import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
 import Controler.Map;
+import Item.InfoBomb;
+import Item.InfoItem;
+import Item.ItemType;
+import Item.StateBomb;
 import Model.BombermanGame;
 import Strategies.Strategy;
 import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
 
+import java.lang.reflect.Array;
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 
 public class ServiceClient implements Runnable, Observer {
+
     private  Socket ma_connection;
     private int reponse;
     private ArrayList<Socket> clients = new ArrayList<>();
-    private Map map;
-    private BombermanGame game = null;
+    private Map map;    private BombermanGame game = null;
     private ArrayList<Strategy> objets_strategies = new ArrayList<>();
     private ControleurBombermanGame controleurBombermanGame;
     private PrintWriter ma_sortie = null;
@@ -36,10 +41,9 @@ public class ServiceClient implements Runnable, Observer {
     private  String nomMap;
 
     // Constante projet :
-    private static final String HELP = "/help";
-    private static final String CLASSEMENT = "/classement";
-    private static final String PARTIE = "/partie";
-    private static final String QUITTER = "/quit";
+    private final static String START = "start";
+    private final static String STOP = "stop";
+    private final static String RESTART = "restart";
 
     public ServiceClient(Socket la_connection, ArrayList<Socket> clients){
         ma_connection = la_connection;
@@ -83,7 +87,6 @@ public class ServiceClient implements Runnable, Observer {
             //Construction du panneau des stratégies
             nombre_bbm = game.getEtatJeu().getBombermans().size();
 
-
             System.out.println("Initialisation réussie !");
         }
         catch (Exception e) {
@@ -91,48 +94,82 @@ public class ServiceClient implements Runnable, Observer {
             e.printStackTrace();
         }
 
-        ma_sortie.println("[Serveur]: Quel est votre ad mail :");
         // Initialisation du nom du client
         while(nomClient.equals("")){
             try {
+                ma_sortie.println("[Serveur]: Quel est votre ad mail :");
                 email = flux_entrant.readLine();
-                joueur = user.getUtilisateur(email, "pute");
+                ma_sortie.println("[Serveur]: Quel est votre mot de passe :");
+                mdp = flux_entrant.readLine();
+
+                joueur = user.getUtilisateur(email, mdp);
                 if(joueur == null){
-                    ma_sortie.println("[Serveur]: Mauvaise adresse mail : réessayer !");
+                    ma_sortie.println("[Serveur]: Mauvais mot de passe ou adresse mail : réessayer !");
                 }
                 else
                     nomClient = joueur.getUserName();
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
         ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);
 
+        String  message_lu = new String();
+        while(true){
 
-            if(!nomClient.equals("")){
+            try {
+                message_lu = flux_entrant.readLine();
 
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if(message_lu.equals(START)){
                 for(int i = 0 ; i < nombre_bbm; i++)
                     objets_strategies.add(new StrategyBombermanRandom());
 
                 game.getEtatJeu().setStrategies_bombermans(objets_strategies);
 
                 game.launch();
-
             }
 
+            if(message_lu.equals(STOP)){
+                ma_sortie.println("Stop");
+                game.stop();
+            }
 
+            if(message_lu.equals(RESTART)){
+                Map map = null;
+                try {
+                    map = new Map(game.getMap().getFilename());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                game.setMap(map);
+                ArrayList<Strategy> strategies =game.getEtatJeu().getStrategies_bombermans();
+                game.init();
+                game.getEtatJeu().setStrategies_bombermans(strategies);
+                game.launch();
+            }
 
+        }
 
     }
 
     @Override
     public void update(Observable observable, Object o) {
-        System.out.println("Tours : "+Integer.toString(game.getTurn()));
-        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), this.game.getEtatJeu().getBombermans(), this.game.getEtatJeu().getItems(), this.game.getEtatJeu().getBombs());
+
+        ArrayList<String> infoBombs = new ArrayList<>();
+        ArrayList<String> infoAgents = new ArrayList<>();
+
+        this.game.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
+        this.game.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
+
+        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, this.game.getEtatJeu().getItems(), infoBombs, this.game.isEndgame());
 
         if(game.isEndgame()){
             ma_sortie.println("[Serveur]: Fin de la partie : ");
@@ -141,10 +178,11 @@ public class ServiceClient implements Runnable, Observer {
                 ma_sortie.println("[Serveur]: Score de "+temp.getColor()+" : " + temp.score);
             }
         }
-        try {
+        //ma_sortie.println("Tours : "+Integer.toString(game.getTurn()));
+        /*try {
             objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

@@ -1,14 +1,20 @@
 package Item;
 
+import java.io.Serializable;
+
 import Agent.Bomberman;
 
-public class InfoBomb {
-	
+public class InfoBomb implements Serializable{
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private int x;
 	private int y;
 	private int range;
 	private Bomberman bomberman;
-		
+
 	StateBomb stateBomb;
 
 	public InfoBomb(int x, int y, int range, StateBomb stateBomb, Bomberman b) {
@@ -64,6 +70,9 @@ public class InfoBomb {
 		this.bomberman = bombermanId;
 	}
 	//#########################################################################
-	
+
+	public String toText() {
+		return (this.x+" "+this.y+" "+this.range+" "+this.stateBomb.toString());
+	}
+
 }
-	

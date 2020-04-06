@@ -14,10 +14,8 @@ public class Agent {
 	private char type;
 	private Strategy strategy;
 	
-	
 	private int id;
 	static int iter_id = 0;
-			
 	
 	private boolean isInvincible;
 	private boolean isSick;
@@ -113,6 +111,11 @@ public class Agent {
 
 	public boolean isDead() {return isDead;}
 	public void setDead(boolean isDead) {this.isDead = isDead;}
+
+	public String toText() {
+		return (this.x+" "+this.y+" "+this.agentAction+" "+this.color+" "+this.type+" "+this.isInvincible+" "+this.isSick+" "+this.isDead);
+	}
+
 }
 	
 
