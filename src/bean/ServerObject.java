@@ -1,17 +1,28 @@
 package bean;
 
-import Agent.Agent;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import Item.InfoBomb;
 import Item.InfoItem;
 
-import java.util.ArrayList;
-
-public class ServerObject {
-
-    private boolean[][] breakable_walls ;
-    private ArrayList<Agent> listInfoAgents;
+public class ServerObject implements Serializable{
+    /**
+	 * 
+	 */
+	private boolean[][] breakable_walls ;
+	//private ArrayList<Agent> listInfoAgents;
     private ArrayList<InfoItem> listInfoItems;
-    private ArrayList<InfoBomb> listInfoBombs;
+    private ArrayList<String> listInfoBombs;
+	
+	
+	private static final long serialVersionUID = 1L;
+	public ServerObject() {
+		super();
+		listInfoItems = new ArrayList<InfoItem>();
+		listInfoBombs = new ArrayList<String>();
+	}
+
 
     public boolean[][] getBreakable_walls() {
         return breakable_walls;
@@ -20,7 +31,26 @@ public class ServerObject {
     public void setBreakable_walls(boolean[][] breakable_walls) {
         this.breakable_walls = breakable_walls;
     }
+    public ArrayList<InfoItem> getListInfoItems() {
+        return listInfoItems;
+    }
 
+    public void setListInfoItems(ArrayList<InfoItem> listInfoItems) {
+    	for(InfoItem s : listInfoItems) {
+    		this.listInfoItems.add(s);
+    	}
+    }
+    public ArrayList<String> getListInfoBombs() {
+        return listInfoBombs;
+    }
+
+    public void setListInfoBombs(ArrayList<String> listInfoBombs) {
+    	for(String s : listInfoBombs) {
+    		this.listInfoBombs.add(s);
+    	}
+    }
+    
+/*
     public ArrayList<Agent> getListInfoAgents() {
         return listInfoAgents;
     }
@@ -28,26 +58,10 @@ public class ServerObject {
     public void setListInfoAgents(ArrayList<Agent> listInfoAgents) {
         this.listInfoAgents = listInfoAgents;
     }
-
-    public ArrayList<InfoItem> getListInfoItems() {
-        return listInfoItems;
-    }
-
-    public void setListInfoItems(ArrayList<InfoItem> listInfoItems) {
-        this.listInfoItems = listInfoItems;
-    }
-
-    public ArrayList<InfoBomb> getListInfoBombs() {
-        return listInfoBombs;
-    }
-
-    public void setListInfoBombs(ArrayList<InfoBomb> listInfoBombs) {
-        this.listInfoBombs = listInfoBombs;
-    }
-
-    public void setInfoGame(boolean[][] breakable_walls, ArrayList<Agent> listInfoAgents, ArrayList<InfoItem> listInfoItems, ArrayList<InfoBomb> listInfoBombs){
+*/
+    public void setInfoGame(boolean[][] breakable_walls, ArrayList<InfoItem> listInfoItems, ArrayList<String> listInfoBombs){
         setBreakable_walls(breakable_walls);
-        setListInfoAgents(listInfoAgents);
+        //setListInfoAgents(listInfoAgents);
         setListInfoItems(listInfoItems);
         setListInfoBombs(listInfoBombs);
     }

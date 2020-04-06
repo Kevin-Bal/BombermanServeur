@@ -1,6 +1,7 @@
 package Agent;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import Controler.GameState;
@@ -11,7 +12,11 @@ import Strategies.Strategy;
 import Controler.Map;
 
 
-public class Bomberman extends Agent{
+public class Bomberman extends Agent implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int range;
 	private int numberOfBombs;
 	public int score;
