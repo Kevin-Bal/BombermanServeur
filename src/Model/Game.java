@@ -57,7 +57,6 @@ public abstract class Game extends Observable implements Runnable{
 		isRunning=true;
 		thread = new Thread(this);
 		thread.start();
-		run();
 	}
 	
 	
