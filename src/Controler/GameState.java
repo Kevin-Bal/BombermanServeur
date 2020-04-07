@@ -1,5 +1,6 @@
 package Controler;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ import Item.StateBomb;
 import Model.BombermanGame;
 import Strategies.*;
 
-public class GameState {
+public class GameState implements Serializable {
 	private int MAX_RANDOM_GENERATE_ITEM=20;
 	
 	private ArrayList<Agent> bombermans = new ArrayList<>();

@@ -1,6 +1,8 @@
 package Item;
 
-public class InfoItem {
+import java.io.Serializable;
+
+public class InfoItem implements Serializable {
 	
 	private int x;
 	private int y;

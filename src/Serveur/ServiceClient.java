@@ -1,18 +1,19 @@
 package Serveur;/* On  importe les  classes  Reseau, Entrees Sorties, Utilitaires */
-import Agent.Agent;
 import Agent.Bomberman;
+import ApiClient.ClientHistoriqueService;
 import ApiClient.ClientUtilisateurService;
+import ApiClient.Historique;
 import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
+import Controler.GameState;
 import Controler.Map;
-import Item.InfoBomb;
 import Item.InfoItem;
-import Item.ItemType;
-import Item.StateBomb;
 import Model.BombermanGame;
+import Model.Game;
 import Strategies.Strategy;
 import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
+import org.apache.commons.lang3.SerializationUtils;
 
 import java.lang.reflect.Array;
 import java.net.*;
@@ -33,6 +34,7 @@ public class ServiceClient implements Runnable, Observer {
     private ServerObject sendObject = new ServerObject();
     private ClientUtilisateurService user = new ClientUtilisateurService();
     private Utilisateur joueur = null;
+    private int nombre_bbm = 0;
 
     // Elements envoyés par le client vers le serveur poour initialiser des attributs important
     private  String nomClient = "";
@@ -70,7 +72,7 @@ public class ServiceClient implements Runnable, Observer {
         // Phase d initialisation
         BufferedReader flux_entrant = null;
         OutputStream outputStream = null;
-        int nombre_bbm = 0;
+
 
         try {
             outputStream = ma_connection.getOutputStream();
@@ -95,7 +97,7 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         // Initialisation du nom du client
-        while(nomClient.equals("")){
+       /* while(nomClient.equals("")){
             try {
                 ma_sortie.println("[Serveur]: Quel est votre ad mail :");
                 email = flux_entrant.readLine();
@@ -115,7 +117,7 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
-        ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);
+        ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);*/
 
         String  message_lu = new String();
         while(true){
@@ -162,27 +164,50 @@ public class ServiceClient implements Runnable, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
+        BombermanGame gameCourant =  SerializationUtils.clone(this.game);
 
+        //ma_sortie.println("Tour : "+ this.game.getTurn());
         ArrayList<String> infoBombs = new ArrayList<>();
         ArrayList<String> infoAgents = new ArrayList<>();
+        ArrayList<InfoItem> infoItems = new ArrayList<>();
+        infoItems.addAll(infoItems);
 
-        this.game.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
-        this.game.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
+        gameCourant.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
+        gameCourant.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
-        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, this.game.getEtatJeu().getItems(), infoBombs, this.game.isEndgame());
 
-        if(game.isEndgame()){
-            ma_sortie.println("[Serveur]: Fin de la partie : ");
-            for(Agent b : this.game.getEtatJeu().getBombermans()) {
-                Bomberman temp = (Bomberman) b;
-                ma_sortie.println("[Serveur]: Score de "+temp.getColor()+" : " + temp.score);
+        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, false);
+
+        /*if(gameCourant.isEndgame()){
+            Bomberman bbm ;
+            if(gameCourant.getEtatJeu().getBombermans().size() > 0)
+                bbm =(Bomberman) gameCourant.getEtatJeu().getBombermans().get(0);
+            else
+                bbm = (Bomberman) gameCourant.getEtatJeu().getDeadBombermans().get(0);
+
+            Historique histo = new Historique();
+            histo.setUsernameJoueur(nomClient);
+            histo.setVictoire("defaite");
+            histo.setScore(bbm.score);
+            histo.setNbJoueur(nombre_bbm);
+            histo.setModeJeu(gameCourant.getGameMode().toString());
+            histo.setEmailJoueur(email);
+            histo.setMapName(nomMap);
+
+            ClientHistoriqueService serviceHisto = new ClientHistoriqueService();
+
+            try {
+                serviceHisto.postHistorique(histo);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
+
+        }*/
         //ma_sortie.println("Tours : "+Integer.toString(game.getTurn()));
-        /*try {
+        try {
             objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }

@@ -10,9 +10,9 @@ public class ServerObject implements Serializable{
      *
      */
     private boolean[][] breakable_walls ;
-    private ArrayList<String> listInfoAgents;
-    private ArrayList<InfoItem> listInfoItems;
-    private ArrayList<String> listInfoBombs;
+    private ArrayList<String> listInfoAgents = new ArrayList<>();;
+    private ArrayList<InfoItem> listInfoItems = new ArrayList<>();
+    private ArrayList<String> listInfoBombs = new ArrayList<>();;
     private boolean gameDone = false;
 
     public boolean isGameDone() {

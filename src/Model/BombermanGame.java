@@ -3,7 +3,9 @@ package Model;
 import Controler.GameState;
 import Controler.Map;
 
-public class BombermanGame extends Game{
+import java.io.Serializable;
+
+public class BombermanGame extends Game implements Serializable {
 
 	private boolean endgame;
 	private Map map;

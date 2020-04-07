@@ -5,7 +5,9 @@ import Controler.GameState;
 import Strategies.Strategy;
 import Controler.Map;
 
-public class Agent {
+import java.io.Serializable;
+
+public class Agent implements Serializable {
 	
 	private int x;
 	private int y;
