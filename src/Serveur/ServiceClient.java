@@ -5,32 +5,26 @@ import ApiClient.ClientUtilisateurService;
 import ApiClient.Historique;
 import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
-import Controler.GameState;
 import Controler.Map;
 import Item.InfoItem;
 import Model.BombermanGame;
-import Model.Game;
 import Strategies.Strategy;
 import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.SerializationUtils;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.io.*;
 import java.util.*;
 
 
 public class ServiceClient implements Runnable, Observer {
-
     private  Socket ma_connection;
-    private int reponse;
     private ArrayList<Socket> clients = new ArrayList<>();
-    private Map map;    private BombermanGame game = null;
-    private ArrayList<Strategy> objets_strategies = new ArrayList<>();
-    private ControleurBombermanGame controleurBombermanGame;
+    private Map map;    
+    private BombermanGame game = null;
+    private ArrayList<Strategy> objets_strategies = new ArrayList<Strategy>();
     private PrintWriter ma_sortie = null;
-    private ObjectOutputStream objectOutputStream = null;
     private ServerObject sendObject = new ServerObject();
     private ClientUtilisateurService user = new ClientUtilisateurService();
     private Utilisateur joueur = null;
@@ -40,12 +34,14 @@ public class ServiceClient implements Runnable, Observer {
     private  String nomClient = "";
     private  String email = "";
     private  String mdp = "";
-    private  String nomMap;
+    private  String nomMap = "";
 
     // Constante projet :
     private final static String START = "start";
-    private final static String STOP = "pause";
+    private final static String PAUSE = "pause";
     private final static String RESTART = "restart";
+    private final static String STEP = "step";
+
 
     public ServiceClient(Socket la_connection, ArrayList<Socket> clients){
         ma_connection = la_connection;
@@ -75,16 +71,6 @@ public class ServiceClient implements Runnable, Observer {
             InputStreamReader isr = new InputStreamReader(ma_connection.getInputStream(), "UTF-8");
             flux_entrant = new BufferedReader(isr);
             ma_sortie = new PrintWriter(ma_connection.getOutputStream(), true);
-
-            this.map = new Map(nomMap);
-            this.game.setMap(map);
-            this.game.addObserver(this);
-            game.setTime(5);
-            game.init();
-            //Construction du panneau des stratégies
-            nombre_bbm = game.getEtatJeu().getBombermans().size();
-
-            System.out.println("Initialisation réussie !");
         }
         catch (Exception e) {
             System.out.println("Erreur d initialisation") ;
@@ -94,7 +80,9 @@ public class ServiceClient implements Runnable, Observer {
         // Initialisation du nom du client
         while(nomClient.equals("")){
             try {
+                ma_sortie.println("[Serveur]: Quel est votre ad mail :");
                 email = flux_entrant.readLine();
+                ma_sortie.println("[Serveur]: Quel est votre mot de passe :");
                 mdp = flux_entrant.readLine();
 
                 joueur = user.getUtilisateur(email, mdp);
@@ -110,7 +98,10 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
+        ma_sortie.println("[Serveur]: Bienvenue");
 
+
+        // Initialisation du nom de la map
         while(nomMap.equals("")) {
             try {
                 this.nomMap = flux_entrant.readLine();
@@ -120,47 +111,58 @@ public class ServiceClient implements Runnable, Observer {
         }
 
 
-        String  message_lu = new String();
-        while(true){
+        try {
+			this.map = new Map(nomMap);
+	        this.game.setMap(map);
+	        this.game.addObserver(this);
+	        game.setTime(5);
+	        game.init();
+	        //Construction du panneau des stratégies
+	        nombre_bbm = game.getEtatJeu().getBombermans().size();
+		} catch (Exception e1) {e1.printStackTrace();}
 
-            try {
-                message_lu = flux_entrant.readLine();
+        System.out.println("Initialisation réussie !");
+        System.out.println(nombre_bbm);
+        
+        
+        //Initialisation du choix des strategies
+        for(int i = 0 ; i < nombre_bbm; i++)
+            objets_strategies.add(new StrategyBombermanRandom());
+        
+        
+        String message_lu="";
+		 while(true){
 
+				System.out.println("TEST ");
+	            try {
+	                message_lu = flux_entrant.readLine();
+	            } catch (IOException e) {
+	                e.printStackTrace();
+	            }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+	            if(message_lu.equals(START)){
+	                game.getEtatJeu().setStrategies_bombermans(objets_strategies);
+	                game.launch();
+	            }
 
-            if(message_lu.equals(START)){
-                for(int i = 0 ; i < nombre_bbm; i++)
-                    objets_strategies.add(new StrategyBombermanRandom());
+	            if(message_lu.equals(PAUSE)){
+	            	game.stop();
+	            }
+	            if(message_lu.equals(RESTART)){
+	                try {
+	                    new Map(nomMap);
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	                game.init();
+	                game.getEtatJeu().setStrategies_bombermans(objets_strategies);
+	                game.launch();
+	            }
+	            if(message_lu.equals(STEP)){
+	            	game.step();
+	            }
 
-                game.getEtatJeu().setStrategies_bombermans(objets_strategies);
-
-                game.launch();
-            }
-
-            if(message_lu.equals(STOP)){
-                ma_sortie.println("Stop");
-                game.stop();
-            }
-
-            if(message_lu.equals(RESTART)){
-                Map map = null;
-                try {
-                    map = new Map(game.getMap().getFilename());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                game.setMap(map);
-                ArrayList<Strategy> strategies =game.getEtatJeu().getStrategies_bombermans();
-                game.init();
-                game.getEtatJeu().setStrategies_bombermans(strategies);
-                game.launch();
-            }
-
-        }
-
+	        } 
     }
 
     @Override
