@@ -1,6 +1,8 @@
 package Serveur;/* On  importe les  classes  Reseau, Entrees Sorties, Utilitaires */
 import Agent.Agent;
+import Agent.AgentAction;
 import Agent.Bomberman;
+import Agent.ColorAgent;
 import ApiClient.ClientUtilisateurService;
 import ApiClient.Utilisateur;
 import Controler.ControleurBombermanGame;
@@ -94,6 +96,8 @@ public class ServiceClient implements Runnable, Observer {
             e.printStackTrace();
         }
 
+
+        System.out.println("nom client = "+nomClient);
         // Initialisation du nom du client
         while(nomClient.equals("")){
             try {
@@ -115,7 +119,7 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
-        ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);
+        ma_sortie.println("[Serveur]: Bienvenue");
 
         String  message_lu = new String();
         while(true){
@@ -129,16 +133,29 @@ public class ServiceClient implements Runnable, Observer {
             }
 
             if(message_lu.equals(START)){
+                //TEST
+                ArrayList<String> infoBombs = new ArrayList<String>();
+                ArrayList<String> infoAgents = new ArrayList<String>();
+                ArrayList<InfoItem> infoItems= new ArrayList<InfoItem>();
+                boolean[][] breakable_walls = this.game.getEtatJeu().getBrokable_walls();
+
+                InfoBomb ib = new InfoBomb(1, 2, 5, StateBomb.Step1, null);
+                infoBombs.add(ib.toText());
+                Agent ag = new Agent(3,4,AgentAction.MOVE_UP, 'B', ColorAgent.DEFAULT,false,false,null);
+                infoAgents.add(ag.toText());
+                InfoItem ii = new InfoItem(5,6,ItemType.FIRE_UP);
+                infoItems.add(ii);
+
+                this.sendObject.setInfoGame(breakable_walls,infoAgents,infoItems,infoBombs,false);
+                
                 for(int i = 0 ; i < nombre_bbm; i++)
                     objets_strategies.add(new StrategyBombermanRandom());
 
                 game.getEtatJeu().setStrategies_bombermans(objets_strategies);
-
                 game.launch();
             }
 
             if(message_lu.equals(STOP)){
-                ma_sortie.println("Stop");
                 game.stop();
             }
 
@@ -157,32 +174,43 @@ public class ServiceClient implements Runnable, Observer {
             }
 
         }
-
+       
+        
+        /*
+        this.game.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
+        this.game.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
+        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, this.game.getEtatJeu().getItems(), infoBombs, this.game.isEndgame());
+        */        
     }
 
     @Override
     public void update(Observable observable, Object o) {
-
-        ArrayList<String> infoBombs = new ArrayList<>();
-        ArrayList<String> infoAgents = new ArrayList<>();
-
+    	
+        boolean[][] breakable_walls = this.game.getEtatJeu().getBrokable_walls();
+        ArrayList<String> infoBombs = new ArrayList<String>();
+        ArrayList<String> infoAgents = new ArrayList<String>();
+        ArrayList<InfoItem> infoItems= new ArrayList<InfoItem>();
+        infoItems.addAll(this.game.getEtatJeu().getItems());
+        
         this.game.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
         this.game.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
-        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, this.game.getEtatJeu().getItems(), infoBombs, this.game.isEndgame());
-
+        this.sendObject.setInfoGame(breakable_walls,infoAgents,infoItems,infoBombs,false);
+    	
+        
+    	/*
         if(game.isEndgame()){
             ma_sortie.println("[Serveur]: Fin de la partie : ");
             for(Agent b : this.game.getEtatJeu().getBombermans()) {
                 Bomberman temp = (Bomberman) b;
                 ma_sortie.println("[Serveur]: Score de "+temp.getColor()+" : " + temp.score);
             }
-        }
-        //ma_sortie.println("Tours : "+Integer.toString(game.getTurn()));
-        /*try {
+        }*/
+       System.out.println("Tours : "+Integer.toString(game.getTurn()));
+        try {
             objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }
