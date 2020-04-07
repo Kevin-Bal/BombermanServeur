@@ -43,7 +43,6 @@ public abstract class Game extends Observable implements Runnable{
 			}
 		}
 	}
-		
 	
 	
 	//Met le jeu en pause

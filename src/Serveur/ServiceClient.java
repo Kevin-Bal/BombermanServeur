@@ -131,7 +131,7 @@ public class ServiceClient implements Runnable, Observer {
         
         
         String message_lu="";
-		 while(true){
+		while(game.gameContinue()){
 
 				System.out.println("TEST ");
 	            try {
@@ -162,7 +162,9 @@ public class ServiceClient implements Runnable, Observer {
 	            	game.step();
 	            }
 
-	        } 
+	     } 
+		 
+		 System.out.println("Fin de la partie");
     }
 
     @Override
