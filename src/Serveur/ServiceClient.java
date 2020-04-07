@@ -15,8 +15,6 @@ import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.http.entity.StringEntity;
-
 import java.lang.reflect.Array;
 import java.net.*;
 import java.io.*;
