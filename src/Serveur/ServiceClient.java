@@ -13,7 +13,9 @@ import Model.Game;
 import Strategies.Strategy;
 import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.http.entity.StringEntity;
 
 import java.lang.reflect.Array;
 import java.net.*;
@@ -175,8 +177,11 @@ public class ServiceClient implements Runnable, Observer {
         gameCourant.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
         gameCourant.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
+        this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, false);
+        Gson gson          = new Gson();
+        String posting = gson.toJson(this.sendObject);
 
-        this.sendObject.setInfoGame(this.game.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, false);
+        ma_sortie.println(posting);
 
         /*if(gameCourant.isEndgame()){
             Bomberman bbm ;
@@ -204,10 +209,10 @@ public class ServiceClient implements Runnable, Observer {
 
         }*/
         //ma_sortie.println("Tours : "+Integer.toString(game.getTurn()));
-        try {
+        /*try {
             objectOutputStream.writeObject(this.sendObject);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }
