@@ -46,13 +46,12 @@ public class ServiceClient implements Runnable, Observer {
 
     // Constante projet :
     private final static String START = "start";
-    private final static String STOP = "stop";
+    private final static String STOP = "pause";
     private final static String RESTART = "restart";
 
     public ServiceClient(Socket la_connection, ArrayList<Socket> clients){
         ma_connection = la_connection;
         this.clients = clients;
-        this.nomMap = "layouts/alone.lay";
         game = new BombermanGame();
     }
 
@@ -73,12 +72,8 @@ public class ServiceClient implements Runnable, Observer {
     public  void run(){
         // Phase d initialisation
         BufferedReader flux_entrant = null;
-        OutputStream outputStream = null;
-
 
         try {
-            outputStream = ma_connection.getOutputStream();
-            objectOutputStream = new ObjectOutputStream(outputStream);
             InputStreamReader isr = new InputStreamReader(ma_connection.getInputStream(), "UTF-8");
             flux_entrant = new BufferedReader(isr);
             ma_sortie = new PrintWriter(ma_connection.getOutputStream(), true);
@@ -99,11 +94,9 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         // Initialisation du nom du client
-       /* while(nomClient.equals("")){
+        while(nomClient.equals("")){
             try {
-                ma_sortie.println("[Serveur]: Quel est votre ad mail :");
                 email = flux_entrant.readLine();
-                ma_sortie.println("[Serveur]: Quel est votre mot de passe :");
                 mdp = flux_entrant.readLine();
 
                 joueur = user.getUtilisateur(email, mdp);
@@ -119,7 +112,15 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
-        ma_sortie.println("[Serveur]: Bienvenue : "+ nomClient);*/
+
+        while(nomMap.equals("")) {
+            try {
+                this.nomMap = flux_entrant.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         String  message_lu = new String();
         while(true){
@@ -183,7 +184,7 @@ public class ServiceClient implements Runnable, Observer {
 
         ma_sortie.println(posting);
 
-        /*if(gameCourant.isEndgame()){
+        if(gameCourant.isEndgame()){
             Bomberman bbm ;
             if(gameCourant.getEtatJeu().getBombermans().size() > 0)
                 bbm =(Bomberman) gameCourant.getEtatJeu().getBombermans().get(0);
@@ -207,12 +208,6 @@ public class ServiceClient implements Runnable, Observer {
                 e.printStackTrace();
             }
 
-        }*/
-        //ma_sortie.println("Tours : "+Integer.toString(game.getTurn()));
-        /*try {
-            objectOutputStream.writeObject(this.sendObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        }
     }
 }
