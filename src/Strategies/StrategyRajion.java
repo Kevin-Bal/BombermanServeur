@@ -6,10 +6,11 @@ import Agent.Bomberman;
 import Agent.Rajion;
 import Controler.GameState;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class StrategyRajion implements Strategy{
+public class StrategyRajion implements Strategy, Serializable {
 
 	private ArrayList<AgentAction> actions = new ArrayList<>();
 

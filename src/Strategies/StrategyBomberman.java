@@ -7,9 +7,10 @@ import Controler.GameState;
 import Item.InfoBomb;
 import Item.StateBomb;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class StrategyBomberman implements Strategy {
+public class StrategyBomberman implements Strategy, Serializable {
     @Override
     public AgentAction chooseAction(Agent agent, GameState game) {
         ArrayList<AgentAction> listAction = new ArrayList<AgentAction>();

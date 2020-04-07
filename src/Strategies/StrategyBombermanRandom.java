@@ -1,5 +1,6 @@
 package Strategies;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import Agent.Agent;
@@ -7,7 +8,7 @@ import Agent.AgentAction;
 import Agent.Bomberman;
 import Controler.GameState;
 
-public class StrategyBombermanRandom implements Strategy{
+public class StrategyBombermanRandom implements Strategy, Serializable {
 
 	@Override
 	public AgentAction chooseAction(Agent agent, GameState game) {

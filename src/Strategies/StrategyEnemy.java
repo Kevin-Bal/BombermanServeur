@@ -5,11 +5,13 @@ import Agent.AgentAction;
 import Agent.Enemy;
 import Controler.GameState;
 
+import java.io.Serializable;
+
 /*
  * Cette stratégie fait tourner l'ennemi en carré de TAILLE_DU_CARRE x TAILLE_DU_CARRE (ici on a mis 2x2) 
  */
 
-public class StrategyEnemy implements Strategy {
+public class StrategyEnemy implements Strategy, Serializable {
 	int direction=1;
 	int TAILLE_DU_CARRE = 2;
 	
