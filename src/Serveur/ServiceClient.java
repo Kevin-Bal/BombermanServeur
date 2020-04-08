@@ -93,38 +93,43 @@ public class ServiceClient implements Runnable, Observer {
         while(nomClient.equals("")){
             try {
                 connexion = flux_entrant.readLine();
-
-                email = connexion;
-                mdp = flux_entrant.readLine();
-                /*if(connexion.equals(QUIT)){
-
-                    break;
-                }*/
-                joueur = user.getUtilisateur(email, mdp);
-                if(joueur == null){
-                    ma_sortie.println("[Serveur]: Mauvais mot de passe ou adresse mail : réessayer !");
+                if(connexion.equals(QUIT)){
+                    terminer();
+                    return;
                 }
-                else
-                    nomClient = joueur.getUserName();
+                else {
+                    email = connexion;
+                    mdp = flux_entrant.readLine();
+
+                    joueur = user.getUtilisateur(email, mdp);
+                    if (joueur == null) {
+                        ma_sortie.println("[Serveur]: Mauvais mot de passe ou adresse mail : réessayer !");
+                    } else
+                        nomClient = joueur.getUserName();
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        /*
-        if(connexion.equals(QUIT)){
-            terminer();
-            return;
-        }*/
+
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
         ma_sortie.println("[Serveur]: Bienvenue");
 
 
         // Initialisation du nom de la map
+        String choix_map = "";
         while(nomMap.equals("")) {
             try {
-                this.nomMap = flux_entrant.readLine();
+                choix_map = flux_entrant.readLine();
+                if(choix_map.equals(QUIT)){
+                    terminer();
+                    return;
+                }
+                else{
+                    this.nomMap = choix_map;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -146,19 +151,27 @@ public class ServiceClient implements Runnable, Observer {
         
         //Initialisation du choix des strategies
         ma_sortie.println(nombre_bbm);
+        String choix_strats ="";
         for(int i = 0 ; i < nombre_bbm; i++) {
         	try {
-				switch(flux_entrant.readLine()) {
-					case "Bomberman IA 1":
-					    objets_strategies.add(new StrategyBomberman());
-					    break;
-					case "Bomberman Aléatoire":
-					    objets_strategies.add(new StrategyBombermanRandom());
-					    break;
-					case "Bomberman Interactif":
-					    objets_strategies.add(new StrategyBombermanInteractif());
-					    break;
-				}
+                choix_strats = flux_entrant.readLine();
+                if( choix_strats.equals(QUIT)){
+                    terminer();
+                    return;
+                }
+                else {
+                    switch (flux_entrant.readLine()) {
+                        case "Bomberman IA 1":
+                            objets_strategies.add(new StrategyBomberman());
+                            break;
+                        case "Bomberman Aléatoire":
+                            objets_strategies.add(new StrategyBombermanRandom());
+                            break;
+                        case "Bomberman Interactif":
+                            objets_strategies.add(new StrategyBombermanInteractif());
+                            break;
+                    }
+                }
 				
 			} catch (IOException e) {e.printStackTrace();}
         }
@@ -172,63 +185,64 @@ public class ServiceClient implements Runnable, Observer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            switch(message_lu){
-                case START :
-                    game.getEtatJeu().setStrategies_bombermans(objets_strategies);
-                    game.launch();
-                    break;
-
-                case PAUSE :
-                    game.stop();
-                    break;
-
-                case RESTART :
-                    try {
-                        new Map(nomMap);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    game.init();
-                    game.getEtatJeu().setStrategies_bombermans(objets_strategies);
-                    game.launch();
-                    break;
-
-                case STEP :
-                    game.step();
-                    break;
-
-
-            }
-
-            if(game.getEtatJeu().getBombermans().get(0).getStrategy() instanceof StrategyBombermanInteractif){
+            if( message_lu.equals(QUIT)){
+                terminer();
+                return;
+            }else{
                 switch(message_lu){
-                    case MOVE_DOWN :
-                        ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_DOWN);
+                    case START :
+                        game.getEtatJeu().setStrategies_bombermans(objets_strategies);
+                        game.launch();
                         break;
 
-                    case MOVE_LEFT :
-                        ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_LEFT);
+                    case PAUSE :
+                        game.stop();
                         break;
 
-                    case MOVE_RIGHT :
-                        ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_RIGHT);
+                    case RESTART :
+                        try {
+                            new Map(nomMap);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        game.init();
+                        game.getEtatJeu().setStrategies_bombermans(objets_strategies);
+                        game.launch();
                         break;
 
-                    case MOVE_UP :
-                        ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_UP);
+                    case STEP :
+                        game.step();
                         break;
 
-                    case PUT_BOMB :
-                        ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.PUT_BOMB);
-                        break;
+
+                }
+
+                if(game.getEtatJeu().getBombermans().size() != 0 && game.getEtatJeu().getBombermans().get(0).getStrategy() instanceof StrategyBombermanInteractif){
+                    switch(message_lu){
+                        case MOVE_DOWN :
+                            ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_DOWN);
+                            break;
+
+                        case MOVE_LEFT :
+                            ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_LEFT);
+                            break;
+
+                        case MOVE_RIGHT :
+                            ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_RIGHT);
+                            break;
+
+                        case MOVE_UP :
+                            ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.MOVE_UP);
+                            break;
+
+                        case PUT_BOMB :
+                            ((StrategyBombermanInteractif) game.getEtatJeu().getBombermans().get(0).getStrategy()).setAction(AgentAction.PUT_BOMB);
+                            break;
+                    }
                 }
             }
-
-
-
-	     } 
-}
+		}
+    }
 
     @Override
     public void update(Observable observable, Object o) {
