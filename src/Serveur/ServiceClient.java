@@ -82,9 +82,7 @@ public class ServiceClient implements Runnable, Observer {
         // Initialisation du nom du client
         while(nomClient.equals("")){
             try {
-                ma_sortie.println("[Serveur]: Quel est votre ad mail :");
                 email = flux_entrant.readLine();
-                ma_sortie.println("[Serveur]: Quel est votre mot de passe :");
                 mdp = flux_entrant.readLine();
 
                 joueur = user.getUtilisateur(email, mdp);
@@ -173,7 +171,6 @@ public class ServiceClient implements Runnable, Observer {
     public void update(Observable observable, Object o) {
         BombermanGame gameCourant =  SerializationUtils.clone(this.game);
 
-        //ma_sortie.println("Tour : "+ this.game.getTurn());
         ArrayList<String> infoBombs = new ArrayList<>();
         ArrayList<String> infoAgents = new ArrayList<>();
         ArrayList<InfoItem> infoItems = new ArrayList<>();
