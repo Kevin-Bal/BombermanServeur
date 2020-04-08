@@ -12,6 +12,8 @@ public class BombermanGame extends Game implements Serializable {
 	private GameMode gameMode;
 	public GameState etatJeu;
 	
+	
+	
 	@Override
 	public boolean gameContinue() {
 		//System.out.println("Jeu en cours...");

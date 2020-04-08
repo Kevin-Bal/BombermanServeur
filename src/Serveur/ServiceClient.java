@@ -9,6 +9,7 @@ import Controler.ControleurBombermanGame;
 import Controler.Map;
 import Item.InfoItem;
 import Model.BombermanGame;
+import Model.GameMode;
 import Strategies.Strategy;
 import Strategies.StrategyBomberman;
 import Strategies.StrategyBombermanInteractif;
@@ -260,12 +261,29 @@ public class ServiceClient implements Runnable, Observer {
 
             Historique histo = new Historique();
             histo.setUsernameJoueur(nomClient);
-            histo.setVictoire("defaite");
+            
+            //Gagné ou perdu ?
+            if(gameCourant.getGameMode()==GameMode.PVP) {
+            	if(gameCourant.getEtatJeu().getBombermans().get(0)!=null && gameCourant.getEtatJeu().getBombermans().size()==1)
+            		histo.setVictoire("victoire");
+            	else
+            		histo.setVictoire("defaite");
+            }
+            else {
+            	if(gameCourant.getEtatJeu().getEnemies().size()>0)
+            		histo.setVictoire("defaite");
+            	else
+            		histo.setVictoire("victoire");
+            }
+            
+            
+            
             histo.setScore(bbm.score);
             histo.setNbJoueur(nombre_bbm);
             histo.setModeJeu(gameCourant.getGameMode().toString());
             histo.setEmailJoueur(email);
-            histo.setMapName(nomMap);
+            String nomMapPropre = nomMap.split("/")[2];
+            histo.setMapName(nomMapPropre.split(".lay")[0]);
 
             ClientHistoriqueService serviceHisto = new ClientHistoriqueService();
 

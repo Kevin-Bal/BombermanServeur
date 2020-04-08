@@ -7,7 +7,7 @@ public abstract class Game extends Observable implements Runnable{
 	private int maxturn = 500;
 	private boolean isRunning;
 	private Thread thread;
-	private double default_time = 300;
+	private double default_time = 1000;
 	private double time =default_time;
 		
 	//Initialise le jeu
