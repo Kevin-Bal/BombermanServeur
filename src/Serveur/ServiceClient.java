@@ -77,6 +77,8 @@ public class ServiceClient implements Runnable, Observer {
             e.printStackTrace();
         }
 
+
+
         // Initialisation du nom du client
         while(nomClient.equals("")){
             try {
