@@ -10,6 +10,7 @@ import Controler.Map;
 import Item.InfoItem;
 import Model.BombermanGame;
 import Strategies.Strategy;
+import Strategies.StrategyBomberman;
 import Strategies.StrategyBombermanInteractif;
 import Strategies.StrategyBombermanRandom;
 import bean.ServerObject;
@@ -140,12 +141,27 @@ public class ServiceClient implements Runnable, Observer {
 		} catch (Exception e1) {e1.printStackTrace();}
 
         System.out.println("Initialisation réussie !");
-        System.out.println(nombre_bbm);
         
         
         //Initialisation du choix des strategies
-        for(int i = 0 ; i < nombre_bbm; i++)
-            objets_strategies.add(new StrategyBombermanInteractif());
+        ma_sortie.println(nombre_bbm);
+        for(int i = 0 ; i < nombre_bbm; i++) {
+        	try {
+				switch(flux_entrant.readLine()) {
+					case "Bomberman IA 1":
+					    objets_strategies.add(new StrategyBomberman());
+					    break;
+					case "Bomberman Aléatoire":
+					    objets_strategies.add(new StrategyBombermanRandom());
+					    break;
+					case "Bomberman Interactif":
+					    //objets_strategies.add(new StrategyBombermanInteractif());
+					    break;
+				}
+				
+			} catch (IOException e) {e.printStackTrace();}
+        }
+
         
         
         String message_lu="";
