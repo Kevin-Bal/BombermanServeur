@@ -5,5 +5,9 @@
 	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/commonsLang/commons-lang3-3.10.jar"/>
 	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/gson-2.8.2.jar"/>
 	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/jasypt-1.9.0.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/Jar API server/jar_files2/httpcore-4.4.13.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/Jar API server/jar_files2/httpclient-4.5.12.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/Jar API server/jar_files2/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="/home/etudiant/Téléchargements/Jar API server/jar_files2/commons-codec-1.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

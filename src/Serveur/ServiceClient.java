@@ -96,10 +96,10 @@ public class ServiceClient implements Runnable, Observer {
 
                 email = connexion;
                 mdp = flux_entrant.readLine();
-                if(connexion.equals(QUIT)){
+                /*if(connexion.equals(QUIT)){
 
                     break;
-                }
+                }*/
                 joueur = user.getUtilisateur(email, mdp);
                 if(joueur == null){
                     ma_sortie.println("[Serveur]: Mauvais mot de passe ou adresse mail : réessayer !");
@@ -111,10 +111,11 @@ public class ServiceClient implements Runnable, Observer {
                 e.printStackTrace();
             }
         }
+        /*
         if(connexion.equals(QUIT)){
             terminer();
             return;
-        }
+        }*/
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
         ma_sortie.println("[Serveur]: Bienvenue");
@@ -155,7 +156,7 @@ public class ServiceClient implements Runnable, Observer {
 					    objets_strategies.add(new StrategyBombermanRandom());
 					    break;
 					case "Bomberman Interactif":
-					    //objets_strategies.add(new StrategyBombermanInteractif());
+					    objets_strategies.add(new StrategyBombermanInteractif());
 					    break;
 				}
 				
@@ -165,9 +166,7 @@ public class ServiceClient implements Runnable, Observer {
         
         
         String message_lu="";
-		while(game.gameContinue()){
-
-            System.out.println("TEST ");
+		while(game.gameContinue() || !game.isEndgame()){
             try {
                 message_lu = flux_entrant.readLine();
             } catch (IOException e) {
@@ -229,9 +228,7 @@ public class ServiceClient implements Runnable, Observer {
 
 
 	     } 
-		 
-		 System.out.println("Fin de la partie");
-    }
+}
 
     @Override
     public void update(Observable observable, Object o) {
@@ -240,19 +237,22 @@ public class ServiceClient implements Runnable, Observer {
         ArrayList<String> infoBombs = new ArrayList<>();
         ArrayList<String> infoAgents = new ArrayList<>();
         ArrayList<InfoItem> infoItems = new ArrayList<>();
+        boolean gameDone = gameCourant.isEndgame();
         infoItems.addAll(infoItems);
 
         gameCourant.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
         gameCourant.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
-        this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, false);
+        
+        this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, gameDone);
         Gson gson          = new Gson();
         String posting = gson.toJson(this.sendObject);
 
         ma_sortie.println(posting);
-
-        if(gameCourant.isEndgame()){
-            Bomberman bbm ;
+        
+        if(gameCourant.isEndgame()) {
+   		 //Envoi du résultat à l'API
+   		 Bomberman bbm ;
             if(gameCourant.getEtatJeu().getBombermans().size() > 0)
                 bbm =(Bomberman) gameCourant.getEtatJeu().getBombermans().get(0);
             else
@@ -274,7 +274,6 @@ public class ServiceClient implements Runnable, Observer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 }

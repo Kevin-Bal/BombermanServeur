@@ -1,8 +1,5 @@
 package Strategies;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.Serializable;
 
 import Agent.Agent;
@@ -22,10 +19,8 @@ public class StrategyBombermanInteractif implements Strategy, Serializable {
     @Override
     public AgentAction chooseAction(Agent agent, GameState game) {
         Bomberman bomberman = (Bomberman) agent;
-        AgentAction ac = action;
-        action = AgentAction.STOP;
-        if(bomberman.isLegalMove(game.getMap(),game.getBombermans(), ac)){
-            return ac;
+        if(bomberman.isLegalMove(game.getMap(),game.getBombermans(), action)){
+            return action;
         }
         else return  AgentAction.STOP;
     }
