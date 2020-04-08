@@ -161,7 +161,7 @@ public class ServiceClient implements Runnable, Observer {
                     return;
                 }
                 else {
-                    switch (flux_entrant.readLine()) {
+                    switch (choix_strats) {
                         case "Bomberman IA 1":
                             objets_strategies.add(new StrategyBomberman());
                             break;
@@ -176,13 +176,12 @@ public class ServiceClient implements Runnable, Observer {
 				
 			} catch (IOException e) {e.printStackTrace();}
         }
-
-        
         
         String message_lu="";
-		while(game.gameContinue() || !game.isEndgame()){
+		while(true){
             try {
                 message_lu = flux_entrant.readLine();
+                System.out.println(message_lu);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -201,6 +200,7 @@ public class ServiceClient implements Runnable, Observer {
                         break;
 
                     case RESTART :
+                        System.out.println("ypo");
                         try {
                             new Map(nomMap);
                         } catch (Exception e) {
@@ -215,6 +215,8 @@ public class ServiceClient implements Runnable, Observer {
                         game.step();
                         break;
 
+                    case "STOP" :
+                        return;
 
                 }
 
@@ -259,7 +261,7 @@ public class ServiceClient implements Runnable, Observer {
         gameCourant.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
         
-        this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, gameDone);
+        this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, gameDone, gameCourant.getGameMode().toString());
         Gson gson          = new Gson();
         String posting = gson.toJson(this.sendObject);
 
@@ -278,16 +280,24 @@ public class ServiceClient implements Runnable, Observer {
             
             //Gagné ou perdu ?
             if(gameCourant.getGameMode()==GameMode.PVP) {
-            	if(gameCourant.getEtatJeu().getBombermans().get(0)!=null && gameCourant.getEtatJeu().getBombermans().size()==1)
-            		histo.setVictoire("victoire");
-            	else
+                if (gameCourant.getEtatJeu().getBombermans().get(0) != null && gameCourant.getEtatJeu().getBombermans().size() == 1){
+                    histo.setVictoire("victoire");
+                    ma_sortie.println("victoire");
+                }
+            	else{
             		histo.setVictoire("defaite");
+                    ma_sortie.println("defaite");
+            	}
             }
             else {
-            	if(gameCourant.getEtatJeu().getEnemies().size()>0)
-            		histo.setVictoire("defaite");
-            	else
-            		histo.setVictoire("victoire");
+            	if(gameCourant.getEtatJeu().getEnemies().size()>0) {
+                    histo.setVictoire("defaite");
+                    ma_sortie.println("defaite");
+                }
+            	else {
+                    histo.setVictoire("victoire");
+                    ma_sortie.println("victoire");
+                }
             }
             
             
