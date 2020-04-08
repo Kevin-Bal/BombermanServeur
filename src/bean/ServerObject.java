@@ -14,6 +14,21 @@ public class ServerObject implements Serializable{
     private ArrayList<InfoItem> listInfoItems = new ArrayList<>();
     private ArrayList<String> listInfoBombs = new ArrayList<>();
     private boolean gameDone = false;
+    private String gameMode = "";
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+
 
     public boolean isGameDone() {
         return gameDone;
@@ -60,14 +75,17 @@ public class ServerObject implements Serializable{
         this.listInfoAgents = listInfoAgents;
     }
 
-    public void setInfoGame(boolean[][] breakable_walls, ArrayList<String> listInfoAgents, ArrayList<InfoItem> listInfoItems, ArrayList<String> listInfoBombs, boolean gameDone){
-    	this.listInfoBombs.removeAll(this.listInfoBombs);
-    	this.listInfoItems.removeAll(this.listInfoItems);
+
+
+    public void setInfoGame(boolean[][] breakable_walls, ArrayList<String> listInfoAgents, ArrayList<InfoItem> listInfoItems, ArrayList<String> listInfoBombs, boolean gameDone, String gameMode){
+      	this.listInfoBombs.removeAll(this.listInfoBombs);
+    	  this.listInfoItems.removeAll(this.listInfoItems);
     	
         setBreakable_walls(breakable_walls);
         setListInfoAgents(listInfoAgents);
         setListInfoItems(listInfoItems);
         setListInfoBombs(listInfoBombs);
         setGameDone(gameDone);
+        setGameMode(gameMode);
     }
 }
