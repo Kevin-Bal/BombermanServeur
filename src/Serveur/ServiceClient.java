@@ -77,7 +77,15 @@ public class ServiceClient implements Runnable, Observer {
             InputStreamReader isr = new InputStreamReader(ma_connection.getInputStream(), "UTF-8");
             flux_entrant = new BufferedReader(isr);
             ma_sortie = new PrintWriter(ma_connection.getOutputStream(), true);
-
+           /* while(nomMap.equals("")) {
+                try {
+                    this.nomMap = flux_entrant.readLine();
+                    ma_sortie.println("[Server] : map choisie");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }*/
+            this.nomMap = "layouts/alone.lay";
             this.map = new Map(nomMap);
             this.game.setMap(map);
             this.game.addObserver(this);
@@ -92,6 +100,8 @@ public class ServiceClient implements Runnable, Observer {
             System.out.println("Erreur d initialisation") ;
             e.printStackTrace();
         }
+
+
 
         // Initialisation du nom du client
         while(nomClient.equals("")){
@@ -112,14 +122,8 @@ public class ServiceClient implements Runnable, Observer {
         }
 
         System.out.println("[Serveur]: Connexion de : "+ nomClient );
+        ma_sortie.println("[Serveur]: Bienvenue");
 
-        while(nomMap.equals("")) {
-            try {
-                this.nomMap = flux_entrant.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
 
         String  message_lu = new String();
