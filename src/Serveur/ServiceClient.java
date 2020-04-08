@@ -1,6 +1,7 @@
 package Serveur;/* On  importe les  classes  Reseau, Entrees Sorties, Utilitaires */
 import Agent.AgentAction;
 import Agent.Bomberman;
+import Agent.ColorAgent;
 import ApiClient.ClientHistoriqueService;
 import ApiClient.ClientUtilisateurService;
 import ApiClient.Historique;
@@ -161,7 +162,7 @@ public class ServiceClient implements Runnable, Observer {
                     return;
                 }
                 else {
-                    switch (flux_entrant.readLine()) {
+                    switch (choix_strats) {
                         case "Bomberman IA 1":
                             objets_strategies.add(new StrategyBomberman());
                             break;
@@ -253,17 +254,19 @@ public class ServiceClient implements Runnable, Observer {
         ArrayList<String> infoAgents = new ArrayList<>();
         ArrayList<InfoItem> infoItems = new ArrayList<>();
         boolean gameDone = gameCourant.isEndgame();
-        infoItems.addAll(infoItems);
-
+        infoItems.addAll(gameCourant.getEtatJeu().getItems());
+        
+        
         gameCourant.getEtatJeu().getBombs().stream().forEach(bomb -> infoBombs.add(bomb.toText()));
         gameCourant.getEtatJeu().getAgents().stream().forEach(agent -> infoAgents.add(agent.toText()));
 
-        
+
         this.sendObject.setInfoGame(gameCourant.getEtatJeu().getBrokable_walls(), infoAgents, infoItems, infoBombs, gameDone);
         Gson gson          = new Gson();
         String posting = gson.toJson(this.sendObject);
 
         ma_sortie.println(posting);
+        
         
         if(gameCourant.isEndgame()) {
    		 //Envoi du résultat à l'API
@@ -278,7 +281,7 @@ public class ServiceClient implements Runnable, Observer {
             
             //Gagné ou perdu ?
             if(gameCourant.getGameMode()==GameMode.PVP) {
-            	if(gameCourant.getEtatJeu().getBombermans().get(0)!=null && gameCourant.getEtatJeu().getBombermans().size()==1)
+            	if(gameCourant.getEtatJeu().getBombermans().get(0).getColor()==ColorAgent.BLEU && gameCourant.getEtatJeu().getBombermans().size()==1)
             		histo.setVictoire("victoire");
             	else
             		histo.setVictoire("defaite");
